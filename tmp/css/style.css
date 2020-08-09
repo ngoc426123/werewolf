@@ -80,13 +80,13 @@ body:before {
     fill: transparent;
     stroke: transparent;
     stroke-width: 1px;
-    transition: stroke-dashoffset .4s linear 1s, fill .4s linear;
+    transition: all .1s linear;
 }
 .card g.show path {
     stroke-dashoffset: 0 !important;
     fill: #ffffff !important;
     stroke: #ffffff !important;
-    transition: stroke-dashoffset .4s linear, fill .4s linear 1s;
+    transition: stroke-dashoffset .8s ease, stroke .8s ease, fill .8s linear 1.2s !important;
 }
 .card #BG path.st0 {
     stroke: #ffffff;

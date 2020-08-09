@@ -14,17 +14,15 @@ io.on(`connection`, async socket => {
     socket.on(`join-room`, (name) => {
         const member = {'id': socket.id,'name': name, character: ''};
         array_member.push(member);
-        io.emit('member-join', member);
+        io.to(socket.id).emit('member-join', member);
+        io.emit('member-join-server', member);
     });
     socket.on(`disconnect`, (name) => {
         const member_id = socket.id;
-        const memberLeave = array_member.filter(item => {
-            return item.id === member_id;
-        });
-        if ( memberLeave[0] ) {
-            array_member.splice(memberLeave[0].id, 1);
-            console.log(array_member);
-        }
+        const indexLeave = array_member.findIndex((item) => (item.id === member_id));
+        const inArray = array_member.some((item) => (item.id === member_id));
+
+        (inArray) && array_member.splice(indexLeave, 1);
         io.emit('member-leave', member_id);
     });
     socket.on(`load-server`, () => {
@@ -40,9 +38,25 @@ io.on(`connection`, async socket => {
         data_character = random_array(data_character);
         array_member.forEach((element, index) => {
             element.character = data_character[index];
-            io.to(element.id).emit('start-game', data_character[index]);
+            io.to(element.id).emit('flip-card', data_character[index]);
         });
         io.emit('start-game-player', array_member);
+    });
+    socket.on(`restart-game`, (data) => {   
+        array_member.forEach((element, index) => {
+            io.to(element.id).emit('flip-card', `START`);
+        });
+        io.emit('restart-game-player');
+    });
+    socket.on(`kill-member`, (id) => {
+        io.to(id).emit('flip-card', `DIE`);
+        io.emit('kill-member', id);
+    });
+    socket.on(`resurrection-member`, (id) => {
+        const res_mem = array_member.filter((item) => (item.id === id));
+        const character = res_mem[0].character;
+        io.to(id).emit('flip-card', character);
+        io.emit('resurrection-member', res_mem[0]);
     });
 });
 

@@ -19,7 +19,7 @@ $(() => {
         });
     });
     // ======================================================
-    socket.on(`member-join`, (member) => {
+    socket.on(`member-join-server`, (member) => {
         const tmp = $(`<div class="co">
                             <div class="box-member" data-id="${member.id}">
                                 <div class="img">
@@ -45,10 +45,28 @@ $(() => {
                 character
             } = element;
             const member = $(`.box-member[data-id="${id}"]`);
-            
+
             member.find(`svg`).find(`g`).removeClass(`show`);
             member.find(`svg`).find(`g[id="${character}"]`).addClass(`show`);
         }); 
+    });
+    socket.on(`restart-game-player`, () => {
+        $(`.box-member`).each((index, element) => {
+            $(element).find(`svg`).find(`g`).removeClass(`show`);
+            $(element).find(`svg`).find(`g[id="START"]`).addClass(`show`);
+        }); 
+    });
+    socket.on(`kill-member`, (id) => {
+        const member = $(`.box-member[data-id="${id}"]`);
+
+        member.find(`svg`).find(`g`).removeClass(`show`);
+        member.find(`svg`).find(`g[id="DIE"]`).addClass(`show`);
+    });
+    socket.on(`resurrection-member`, (res_mem) => {
+        const member = $(`[data-id="${res_mem.id}"]`);
+
+        member.find(`svg`).find(`g`).removeClass(`show`);
+        member.find(`svg`).find(`g[id="${res_mem.character}"]`).addClass(`show`);
     });
     $(`.box-character .control .up`).on(`click`, (event) => {
         const count = parseInt($(event.target).parents(`.control`).prev(`.count`).text()) + 1;
@@ -92,4 +110,16 @@ $(() => {
         });
         return result;
     }
+    $(`.btn-restart`).on(`click`, () => {
+        socket.emit('restart-game');
+    });
+
+    $(`html`).on(`click`, `.box-member .kill` , (event) => {
+        const isKill = $(event.target).parents(`.box-member`).hasClass(`hasKill`);
+        const id = $(event.target).parents(`.box-member`).attr(`data-id`);
+
+        ( isKill ) && $(event.target).parents(`.box-member`).removeClass(`hasKill`);
+        ( !isKill ) && $(event.target).parents(`.box-member`).addClass(`hasKill`);
+        ( !isKill ) ? socket.emit(`kill-member`, id) : socket.emit(`resurrection-member`, id);
+    });
 });

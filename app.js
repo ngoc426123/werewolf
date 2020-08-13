@@ -2,12 +2,14 @@ const express = require(`express`);
 const appExpress = express();
 const server = require(`http`).createServer(appExpress);
 const io = require(`socket.io`)(server, {});
+const port = process.env.PORT || 3000;
 
 // DEFINE VARIABLE
 let array_member = [];
 
 // SERVER
-server.listen(3000, () => {
+
+server.listen(port, () => {
     console.log(`Open port: 3000`);
 });
 io.on(`connection`, async socket => {

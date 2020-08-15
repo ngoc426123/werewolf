@@ -20,6 +20,9 @@ $(() => {
         $(`.card`).attr(`data-name`, player.name);
         $(`.card`).find(`.name`).text(player.name);
     });
+    socket.on(`restart-game-player`, (player) => {
+        $(`.chatbox`).find(`.item`).remove();
+    });
     // ===============================================================
     $(`.card`).find(`g:not(#BG)`).each((index, element) => {
         $(element).find(`path`).each((ind, ele) => {
@@ -39,22 +42,15 @@ $(() => {
     });
     $(`html`).on(`click`, `.chatbox .inputchat button` , (event) => {
         const content = $(`.chatbox .inputchat input`).val();
-        const name = $(`.card`).data(`name`);
-        const pane = $(`.chatbox .content .tab-pane`);
 
-        pane.find(`.over`).append(`<div class="item">
-                                    <span class="name">${name}</span>  
-                                    <span class="cont">${content}</span>  
-                                </div>`);
-        
-        socket.emit(`chat-from-client`, content);
+        socket.emit(`chat-from-client-to-server`, content);
         $(`.chatbox .inputchat input`).val(``);
     });
-    socket.on(`chat-request-from-server`, (content) => {
+    socket.on(`chat-from-server-to-client`, (data) => {
         const pane = $(`.chatbox .content .tab-pane`);
         pane.find(`.over`).append(`<div class="item">
-                                    <span class="name">Lawer</span>  
-                                    <span class="cont">${content}</span>  
+                                    <span class="name">${data.name}</span>  
+                                    <span class="cont">${data.content}</span>  
                                 </div>`);
     });
 });

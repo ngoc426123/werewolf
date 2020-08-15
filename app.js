@@ -1,4 +1,5 @@
 const express = require(`express`);
+const { Console } = require("console");
 const appExpress = express();
 const server = require(`http`).createServer(appExpress);
 const io = require(`socket.io`)(server, {});
@@ -6,15 +7,19 @@ const port = process.env.PORT || 3000;
 
 // DEFINE VARIABLE
 let array_player = [];
+let array_wolf_group = [`WOLF`, `BIG-WOLF`, `WHITE-WOLF`, `BLACK-WOLF`, `PARSE-WOLF`]
+let nameOfServer = "Lawer";
+let unknowPlayerName = "player" // name + random number 1000 9999;
 
 // SERVER
-
 server.listen(port, () => {
     console.log(`Open port: 3000`);
 });
 io.on(`connection`, async socket => {
     socket.on(`join-room`, (name) => {
-        const player = {'id': socket.id,'name': (name) ? name : 'Player', character: ''};
+        const random = Math.floor(Math.random() * 9999) + 1000;
+        const nameUnknow = `${unknowPlayerName} - ${random}`;
+        const player = {'id': socket.id,'name': (name) ? name : nameUnknow, character: ''};
         array_player.push(player);
         io.to(socket.id).emit('player-join', player);
         io.emit('player-join-server', player);
@@ -60,17 +65,42 @@ io.on(`connection`, async socket => {
         io.to(id).emit('flip-card', character);
         io.emit('resurrection-player', res_mem[0]);
     });
-    socket.on(`chat-from-server`, (data) => {
+    socket.on(`chat-from-server-to-server`, (data) => {
         const {
             target,
             content
         } = data;
-        const array_request_player = array_player.filter((item) => item.character === target);
+        const name = nameOfServer;
+        const isWolf = array_wolf_group.some((item) => item == target);
+        const array_request_player = array_player.filter((item) => {
+            if ( isWolf ) {
+                return array_wolf_group.indexOf(item.character) >= 0;
+            } else {
+                return item.character === target;
+            }
+        });
 
         array_request_player.forEach((element) => {
             const id = element.id;
-            io.to(id).emit(`chat-request-from-server`, content);
+            io.to(id).emit(`chat-from-server-to-client`, {name, content});
         });
+    });
+    socket.on(`chat-from-client-to-server`, (content) => {
+        let { character, name } = array_player.filter((item) => item.id === socket.id)[0];
+        const isWolf = array_wolf_group.some((item) => item == character);
+        const targetForServer = ( isWolf ) ? `WOLF` : character;
+        const array_request_player = array_player.filter((item) => {
+            if ( isWolf ) {
+                return array_wolf_group.indexOf(item.character) >= 0;
+            } else {
+                return item.character === character;
+            }
+        });
+        array_request_player.forEach((element) => {
+            const id = element.id;
+            io.to(id).emit(`chat-from-server-to-client`, {name, content});
+        });
+        io.emit(`chat-request-from-client-to-server`,{targetForServer, name, content});
     });
 });
 

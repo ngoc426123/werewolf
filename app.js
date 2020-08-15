@@ -5,7 +5,7 @@ const io = require(`socket.io`)(server, {});
 const port = process.env.PORT || 3000;
 
 // DEFINE VARIABLE
-let array_member = [];
+let array_player = [];
 
 // SERVER
 
@@ -14,21 +14,21 @@ server.listen(port, () => {
 });
 io.on(`connection`, async socket => {
     socket.on(`join-room`, (name) => {
-        const member = {'id': socket.id,'name': name, character: ''};
-        array_member.push(member);
-        io.to(socket.id).emit('member-join', member);
-        io.emit('member-join-server', member);
+        const player = {'id': socket.id,'name': (name) ? name : 'Player', character: ''};
+        array_player.push(player);
+        io.to(socket.id).emit('player-join', player);
+        io.emit('player-join-server', player);
     });
     socket.on(`disconnect`, (name) => {
-        const member_id = socket.id;
-        const indexLeave = array_member.findIndex((item) => (item.id === member_id));
-        const inArray = array_member.some((item) => (item.id === member_id));
+        const player_id = socket.id;
+        const indexLeave = array_player.findIndex((item) => (item.id === player_id));
+        const inArray = array_player.some((item) => (item.id === player_id));
 
-        (inArray) && array_member.splice(indexLeave, 1);
-        io.emit('member-leave', member_id);
+        (inArray) && array_player.splice(indexLeave, 1);
+        io.emit('player-leave', player_id);
     });
     socket.on(`load-server`, () => {
-        io.emit('load-server-player', array_member);
+        io.emit('load-server-player', array_player);
     })
     socket.on(`start-game`, (data) => {
         let data_character = [];
@@ -38,27 +38,39 @@ io.on(`connection`, async socket => {
             }
         });
         data_character = random_array(data_character);
-        array_member.forEach((element, index) => {
+        array_player.forEach((element, index) => {
             element.character = data_character[index];
             io.to(element.id).emit('flip-card', data_character[index]);
         });
-        io.emit('start-game-player', array_member);
+        io.emit('start-game-player', array_player);
     });
     socket.on(`restart-game`, (data) => {   
-        array_member.forEach((element, index) => {
+        array_player.forEach((element, index) => {
             io.to(element.id).emit('flip-card', `START`);
         });
         io.emit('restart-game-player');
     });
-    socket.on(`kill-member`, (id) => {
+    socket.on(`kill-player`, (id) => {
         io.to(id).emit('flip-card', `DIE`);
-        io.emit('kill-member', id);
+        io.emit('kill-player', id);
     });
-    socket.on(`resurrection-member`, (id) => {
-        const res_mem = array_member.filter((item) => (item.id === id));
+    socket.on(`resurrection-player`, (id) => {
+        const res_mem = array_player.filter((item) => (item.id === id));
         const character = res_mem[0].character;
         io.to(id).emit('flip-card', character);
-        io.emit('resurrection-member', res_mem[0]);
+        io.emit('resurrection-player', res_mem[0]);
+    });
+    socket.on(`chat-from-server`, (data) => {
+        const {
+            target,
+            content
+        } = data;
+        const array_request_player = array_player.filter((item) => item.character === target);
+
+        array_request_player.forEach((element) => {
+            const id = element.id;
+            io.to(id).emit(`chat-request-from-server`, content);
+        });
     });
 });
 

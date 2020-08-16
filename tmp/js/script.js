@@ -3,15 +3,11 @@ $(() => {
     noSleep.enable();
     const socket = io();
     // ===============================================================
-    $(`.btn-click-start`).on(`click`, () => {
-        const name = $(`.name`).val();
-        socket.emit('join-room', name);
-        $(`.form`).remove();
-        $(`.card`).removeClass(`hidden`);
-    });
     socket.on(`flip-card`, (character) => {
         const player = $(`.card`);
 
+        ( character === `VILLAGER` ) && $(`.chatbox`).hide();
+        ( character !== `VILLAGER` ) && $(`.chatbox`).show();
         player.find(`svg`).find(`g`).removeClass(`show`);
         player.find(`svg`).find(`g[id="${character}"]`).addClass(`show`);
     });
@@ -24,6 +20,12 @@ $(() => {
         $(`.chatbox`).find(`.item`).remove();
     });
     // ===============================================================
+    $(`.btn-click-start`).on(`click`, () => {
+        const name = $(`.name`).val();
+        socket.emit('join-room', name);
+        $(`.form`).remove();
+        $(`.card`).removeClass(`hidden`);
+    });
     $(`.card`).find(`g:not(#BG)`).each((index, element) => {
         $(element).find(`path`).each((ind, ele) => {
             const length = $(ele)[0].getTotalLength();

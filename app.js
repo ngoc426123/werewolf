@@ -53,6 +53,7 @@ io.on(`connection`, async socket => {
         array_player.forEach((element, index) => {
             io.to(element.id).emit('flip-card', `START`);
         });
+        array_wolf_group.splice(array_wolf_group.indexOf(`WANDER`), 1);
         io.emit('restart-game-player');
     });
     socket.on(`kill-player`, (id) => {
@@ -101,6 +102,13 @@ io.on(`connection`, async socket => {
             io.to(id).emit(`chat-from-server-to-client`, {name, content});
         });
         io.emit(`chat-request-from-client-to-server`,{targetForServer, name, content});
+    });
+    socket.on(`change-chat-wander`, (data) => {
+        if ( data ) {
+            array_wolf_group.push(`WANDER`);
+        } else {
+            array_wolf_group.splice(array_wolf_group.indexOf(`WANDER`), 1);
+        }
     });
 });
 

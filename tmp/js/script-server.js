@@ -132,10 +132,19 @@ $(() => {
     /////////////////////////////////////////////////////////////
     $(`.box-character:not([data-character="BIG-WOLF"])`).each((index, element) => {
         const character = $(element).data(`character`);
+        const isWander = (character === `WANDER`);
+        const tmp_character = $(`<li><a data-target="tab-${character}" data-toggle="tab">${character}</a></li>`);
+        const tmp_content = $(`<div class="tab-pane" role="tabpanel" id="tab-${character}"><div class="over"></div></div>`);
 
-        $(`.chatbox`).find(`.character`).find(`ul`).append(`<li><a data-target="tab-${character}" data-toggle="tab">${character}</a></li>`);
-        $(`.chatbox`).find(`.content`).append(`<div class="tab-pane" role="tabpanel" id="tab-${character}"><div class="over"></div></div>`);
+        ( isWander ) && tmp_content.addClass(`isWander`).prepend(`<div class="checkboxWander">Is wolf <input type="checkbox" value="isWolf"></div>`);
+
+        $(`.chatbox`).find(`.character`).find(`ul`).append(tmp_character);
+        $(`.chatbox`).find(`.content`).append(tmp_content);
     });
+    $(`html`).on(`change`, `.checkboxWander input`, (event) => {
+        const isChecked = $(event.target).is(`:checked`);
+        socket.emit(`change-chat-wander`, isChecked);
+    })
     $(`html`).on(`click`, `.chatbox .toggle` , (event) => {
         const isToggle = $(`.chatbox`).hasClass(`show`);
 

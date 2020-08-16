@@ -142,7 +142,6 @@ body:before {
   padding-right: 2px;
 }
 .box-character {
-  margin-bottom: 5px;
   position: relative;
 }
 .box-character .img svg {
@@ -233,6 +232,22 @@ body:before {
 }
 .chatbox .content .tab-pane {
   height: 100%;
+}
+.chatbox .content .tab-pane.isWander .over {
+  height: calc(100% - 35px);
+}
+.chatbox .content .checkboxWander {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: 35px;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  padding: 2px 10px;
+  color: #ffffff;
+  font-size: 12px;
+}
+.chatbox .content .checkboxWander input {
+  margin-left: 10px;
 }
 .chatbox .item{
   margin-bottom: 10px;

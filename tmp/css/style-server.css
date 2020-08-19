@@ -150,6 +150,9 @@ body:before {
 .box-character g:not(#BG) path,
 .box-character g#BG path.st0 {
   stroke: #ffffff;
+  stroke-width: 2px;
+}
+.box-character g#BG path.st0{
   stroke-width: 5px;
 }
 .box-character g:not(#BG) path {
@@ -230,6 +233,14 @@ body:before {
   color:#ffffff;
   font-size: 13px;
 }
+.chatbox .content .over::-webkit-scrollbar {
+  width: 10px;
+  background-color: #1f1f1f;
+}
+.chatbox .content .over::-webkit-scrollbar-thumb {
+  background-color: #585858;
+  outline: none;
+}
 .chatbox .content .tab-pane {
   height: 100%;
 }
@@ -286,6 +297,11 @@ body:before {
   background-color: #151515;
   color:#ffffff;
   border: none;
+  outline: none;
+  cursor: pointer;
+}
+.chatbox .inputchat button:hover {
+  background-color: #222222;
 }
 .chatbox .character {
   background-color: #0c0c0c;

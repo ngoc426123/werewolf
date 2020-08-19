@@ -7,7 +7,7 @@ const port = process.env.PORT || 3000;
 
 // DEFINE VARIABLE
 let array_player = [];
-let array_wolf_group = [`WOLF`, `BIG-WOLF`, `WHITE-WOLF`, `BLACK-WOLF`, `PARSE-WOLF`]
+let array_wolf_group = [`WOLF`, `BIG-WOLF`, `WHITE-WOLF`, `CURSED-WOLF`, `BABY-WOLF`]
 let nameOfServer = "Lawer";
 let unknowPlayerName = "player" // name + random number 1000 9999;
 

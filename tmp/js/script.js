@@ -46,13 +46,15 @@ $(() => {
         const content = $(`.chatbox .inputchat input`).val();
 
         socket.emit(`chat-from-client-to-server`, content);
-        $(`.chatbox .inputchat input`).val(``);
+        $(`.chatbox .inputchat input`).val(``).focus();
     });
     socket.on(`chat-from-server-to-client`, (data) => {
         const pane = $(`.chatbox .content .tab-pane`);
-        pane.find(`.over`).append(`<div class="item">
-                                    <span class="name">${data.name}</span>  
-                                    <span class="cont">${data.content}</span>  
-                                </div>`);
+        pane.find(`.over`)
+            .append(`<div class="item">
+                    <span class="name">${data.name}</span>  
+                    <span class="cont">${data.content}</span>  
+                </div>`)
+            .animate({scrollTop: pane.find(`.over`).prop("scrollHeight")}, 1);
     });
 });
